@@ -5,6 +5,7 @@ use std::path::Path;
 use crate::sound::FromFileError;
 use crate::sound::SoundData;
 use ringbuf::HeapRb;
+use symphonia::core::io::MediaSource;
 
 use super::decoder::symphonia::SymphoniaDecoder;
 use super::{StreamingSoundHandle, StreamingSoundSettings};
@@ -43,6 +44,16 @@ impl StreamingSoundData<FromFileError> {
 	) -> Result<StreamingSoundData<FromFileError>, FromFileError> {
 		Ok(StreamingSoundData {
 			decoder: Box::new(SymphoniaDecoder::new(Box::new(cursor))?),
+			settings,
+		})
+	}
+	/// Creates a [`StreamingSoundData`] from a [`Box`] of any struct that implements [`MediaSource`]
+	pub fn from_media_source(
+		source: Box<dyn MediaSource>,
+		settings: StreamingSoundSettings,
+	) -> Result<StreamingSoundData<FromFileError>, FromFileError> {
+		Ok(StreamingSoundData {
+			decoder: Box::new(SymphoniaDecoder::new(source)?),
 			settings,
 		})
 	}
